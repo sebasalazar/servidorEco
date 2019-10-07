@@ -30,5 +30,8 @@
 *.exe
 *.out
 *.app
-/app/servidor/build/
-/app/servidor/dist/
+build
+dist
+core
+
+nbproject/
