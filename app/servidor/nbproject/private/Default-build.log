@@ -1,3 +1,0 @@
-rm -fr *.o a.out servidor dist build core
-mkdir -p build dist
-make: *** No hay ninguna regla para construir el objetivo 'main.cpp', necesario para 'main.o'.  Alto.
