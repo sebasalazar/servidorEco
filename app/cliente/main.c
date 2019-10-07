@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
     /*
      * Estaremos esperando datos.
      */
-    while ((n = recv(sock, pbuffer, largo_recibido, 0)) > 0) {
+    if ((n = recv(sock, pbuffer, largo_recibido, 0)) > 0) {
         pbuffer += n;
         largo_recibido -= n;
         largo += n;
