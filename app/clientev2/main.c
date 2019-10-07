@@ -4,6 +4,9 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <netdb.h>
+#include "utils.h"
 
 /**
  * 
@@ -13,18 +16,39 @@
  */
 int main(int argc, char** argv) {
 
-    const char* nombre_servidor = "localhost";
-    const int puerto_servidor = 7777;
+    if (argc < 4) {
+        fprintf(stderr, "\nArgumentos insufientes");
+        fprintf(stderr, "\n%s servidor puerto 'mensaje'\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    char* nombre_servidor = (char *) calloc(strlen(argv[1]) + 1, sizeof (char));
+    sprintf(nombre_servidor, "%s", argv[1]);
+
+    int puerto_servidor = atoi(argv[2]);
+    fprintf(stdout, "\nServidor: %s:%d\n", nombre_servidor, puerto_servidor);
 
     struct sockaddr_in servidor;
+    struct hostent *host;
+    if ((host = gethostbyname(nombre_servidor)) == NULL) {
+        /*
+         * Se muestra un mensaje de error.
+         */
+        fprintf(stderr, "Nombre del servidor inválido\n");
+        /*
+         * El programa termina con error.
+         */
+        return EXIT_FAILURE;
+    }
+
     memset(&servidor, 0, sizeof (servidor));
     servidor.sin_family = AF_INET;
-
+    
     /*
-     * Crear una representación binaria del nombre del servidor y lo deja en la estructura.
-     * @see https://beej.us/guide/bgnet/html/multi/inet_ntopman.html
+     * Transformo desde el host (que resuelve nombre)
+     * a la estructura que lo usa
      */
-    inet_pton(AF_INET, nombre_servidor, &servidor.sin_addr);
+    memcpy(&servidor.sin_addr, host->h_addr_list[0], host->h_length);
 
     /*
      * La función htons transforma el puerto a formato socket
@@ -66,7 +90,8 @@ int main(int argc, char** argv) {
      * Preparación de datos a enviar
      * Datos a enviar
      */
-    const char* mensaje = "Hola chiquillos";
+    char* mensaje = (char *) calloc(strlen(argv[3]) + 1, sizeof (char));
+    sprintf(mensaje, "%s", argv[3]);
     int largo_mensaje = strlen(mensaje);
     send(sock, mensaje, largo_mensaje, 0);
 
